@@ -1,0 +1,1148 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="description" content="Momentum — mission control for your week: backward-planned deadlines, energy-matched sprints, and evidence-verified capture. One offline file. Triple H Hackathon 2026.">
+<meta name="color-scheme" content="light dark">
+<title>Momentum — mission control for your week</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,500;9..144,700;9..144,900&family=DM+Sans:wght@400;500;700&family=DM+Mono:wght@400;500&display=swap" rel="stylesheet">
+<style>
+/* ================= DESIGN TOKENS =================
+   Direction: industrial/utilitarian "mission control"
+   Palette: paper/ink/burnt-orange, no purple
+   Type: Fraunces display / DM Sans body / DM Mono data
+   Scale: 4pt spacing (4/8/12/16/24/32/64)
+   ================================================ */
+:root{
+  /* surfaces (light) */
+  --s0:#F4F1EA; --s1:#FCFAF5; --s2:#FFFFFF; --s3:#EDE9DF;
+  --ink:#16211D; --ink-2:#3D4A44; --ink-3:#6B756E;
+  --line:#DCD6C8; --line-2:#C7BFAE;
+  --accent:#C2571A; --accent-ink:#9A4413; --accent-wash:#F5E3D4;
+  --ok:#2E7D5B; --ok-wash:#E2EFE7;
+  --warn:#8A6410; --warn-wash:#F1E7C8;
+  --danger:#B3382F; --danger-wash:#F3DEDC;
+  --gold:#8F6E14; --gold-wash:#EFE6CF;
+  --focus:#C2571A;
+  /* type */
+  --f-display:"Fraunces",Georgia,"Times New Roman",serif;
+  --f-ui:"DM Sans","Segoe UI",Verdana,sans-serif;
+  --f-mono:"DM Mono","Cascadia Mono",Consolas,monospace;
+  /* scale */
+  --r-s:4px; --r-m:8px; --r-l:10px;
+  --sh-1:0 1px 2px rgba(22,33,29,.05);
+  --sh-2:0 2px 4px rgba(22,33,29,.06),0 10px 28px rgba(22,33,29,.08);
+}
+html[data-theme="dark"]{
+  --s0:#121816; --s1:#1A2220; --s2:#232D2A; --s3:#2C3834;
+  --ink:#EDEDE6; --ink-2:#C4CBC4; --ink-3:#89957F;
+  --line:#2E3935; --line-2:#3B4A44;
+  --accent:#E8793F; --accent-ink:#F0955F; --accent-wash:#3A2A1F;
+  --ok:#6FBF97; --ok-wash:#1C2F26;
+  --warn:#D1A53C; --warn-wash:#2E2A18;
+  --danger:#E0776F; --danger-wash:#322020;
+  --gold:#D9B45E; --gold-wash:#2E2A16;
+  --focus:#E8793F;
+}
+@media (prefers-color-scheme: dark){
+  html:not([data-theme="light"]){
+    --s0:#121816; --s1:#1A2220; --s2:#232D2A; --s3:#2C3834;
+    --ink:#EDEDE6; --ink-2:#C4CBC4; --ink-3:#89957F;
+    --line:#2E3935; --line-2:#3B4A44;
+    --accent:#E8793F; --accent-ink:#F0955F; --accent-wash:#3A2A1F;
+    --ok:#6FBF97; --ok-wash:#1C2F26;
+    --warn:#D1A53C; --warn-wash:#2E2A18;
+    --danger:#E0776F; --danger-wash:#322020;
+    --gold:#D9B45E; --gold-wash:#2E2A16;
+    --focus:#E8793F;
+  }
+}
+/* ============ RESET + BASE ============ */
+*{box-sizing:border-box;margin:0}
+html{scroll-behavior:smooth}
+body{
+  background:var(--s0); color:var(--ink);
+  font-family:var(--f-ui); font-size:16px; line-height:1.55;
+  -webkit-font-smoothing:antialiased;
+}
+::selection{background:var(--accent-wash); color:var(--accent-ink)}
+input,textarea,select,button{font:inherit;color:inherit}
+:where(a){color:var(--accent-ink)}
+:focus-visible{outline:2px solid var(--focus);outline-offset:2px;border-radius:2px}
+::-webkit-scrollbar{width:10px;height:10px}
+::-webkit-scrollbar-thumb{background:var(--line-2);border-radius:8px}
+::-webkit-scrollbar-track{background:var(--s0)}
+.wrap{max-width:1120px;margin-inline:auto;padding-inline:clamp(16px,4vw,40px)}
+.mono{font-family:var(--f-mono);font-variant-numeric:tabular-nums}
+.eyebrow{font-family:var(--f-mono);font-size:11px;letter-spacing:.14em;text-transform:uppercase;color:var(--ink-3)}
+.sr{position:absolute;width:1px;height:1px;overflow:hidden;clip:rect(0 0 0 0)}
+@media (prefers-reduced-motion: reduce){
+  *,*::before,*::after{animation-duration:.01ms !important;transition-duration:.01ms !important}
+}
+/* ============ TOP BAR ============ */
+.topbar{
+  background:var(--s1);border-bottom:1px solid var(--line);
+  position:sticky;top:0;z-index:40;
+}
+.topbar .row{display:flex;align-items:center;justify-content:space-between;gap:16px;flex-wrap:wrap;padding-block:12px}
+.brand{display:flex;align-items:baseline;gap:10px;text-decoration:none}
+.brand .glyph{
+  width:30px;height:30px;border-radius:7px;background:var(--ink);color:var(--s1);
+  display:grid;place-items:center;font-family:var(--f-display);font-weight:900;font-size:17px;
+  transform:translateY(4px);
+}
+html[data-theme="dark"] .brand .glyph{color:#121816}
+.brand b{font-family:var(--f-display);font-size:21px;font-weight:700;letter-spacing:-.01em;color:var(--ink)}
+.brand .ver{font-family:var(--f-mono);font-size:11px;color:var(--ink-3)}
+.tools{display:flex;gap:8px;flex-wrap:wrap}
+/* ============ HERO (the one Persuade flourish) ============ */
+.hero{padding-block:clamp(32px,7vw,72px) clamp(24px,4vw,44px);position:relative;overflow:hidden}
+.hero::after{
+  content:"";position:absolute;inset:0;pointer-events:none;opacity:.5;
+  background-image:linear-gradient(var(--line) 1px,transparent 1px),linear-gradient(90deg,var(--line) 1px,transparent 1px);
+  background-size:44px 44px;mask-image:linear-gradient(180deg,transparent 35%,var(--s0) 78%);
+  -webkit-mask-image:linear-gradient(180deg,transparent 35%,var(--s0) 78%);
+}
+.hero .inner{position:relative;display:grid;grid-template-columns:minmax(0,7fr) minmax(0,5fr);gap:clamp(24px,4vw,56px)}
+.hero h2{
+  font-family:var(--f-display);font-weight:900;
+  font-size:clamp(34px,5.4vw,58px);line-height:1.04;letter-spacing:-.02em;
+  max-width:12ch;margin:12px 0 16px;
+}
+.hero h2 em{font-style:italic;color:var(--accent-ink)}
+.hero .lede{font-size:clamp(16px,1.6vw,19px);line-height:1.6;color:var(--ink-2);max-width:46ch}
+.hero .cta{display:flex;gap:12px;margin-top:24px;flex-wrap:wrap}
+/* data strip — mission-control readouts */
+.strip{
+  border:1px solid var(--line-2);border-radius:var(--r-l);background:var(--s1);
+  display:grid;grid-template-columns:1fr 1fr;overflow:hidden;align-self:end;
+  box-shadow:var(--sh-1);
+}
+.strip .cell{padding:16px;border-right:1px solid var(--line)}
+.strip .cell:nth-child(2n){border-right:none}
+.strip .cell:nth-child(n+3){border-top:1px solid var(--line)}
+.strip .k{font-family:var(--f-mono);font-size:10.5px;letter-spacing:.12em;text-transform:uppercase;color:var(--ink-3)}
+.strip .v{font-family:var(--f-mono);font-size:19px;font-weight:500;margin-top:6px;line-height:1.25;word-break:break-word}
+.strip .v.big{font-size:15px;line-height:1.35;color:var(--ink)}
+.strip .cell.hot{background:var(--accent-wash)}
+.strip .cell.hot .v{color:var(--accent-ink)}
+/* ============ BUTTONS ============ */
+.btn{
+  display:inline-flex;align-items:center;justify-content:center;gap:8px;
+  min-height:44px;padding:10px 18px;border-radius:var(--r-m);
+  font-weight:700;font-size:15px;cursor:pointer;border:1px solid transparent;
+  background:var(--ink);color:var(--s1);
+  transition:transform 150ms ease-out,box-shadow 150ms ease-out,background 150ms ease-out;
+  box-shadow:var(--sh-1);text-decoration:none;
+}
+html[data-theme="dark"] .btn{color:#121816}
+.btn:hover{transform:translateY(-1px);box-shadow:var(--sh-2)}
+.btn:active{transform:scale(.985);box-shadow:none}
+.btn.primary{background:var(--accent)}
+html[data-theme="dark"] .btn.primary{color:#1A1006}
+.btn.ghost{background:transparent;color:var(--ink);border-color:var(--line-2)}
+.btn.ghost:hover{background:var(--s3)}
+.btn.sm{min-height:36px;padding:6px 12px;font-size:13px}
+/* ============ SECTIONS / NAV ============ */
+.deck{padding-block:8px 56px}
+.subnav{position:sticky;top:57px;z-index:30;background:var(--s0);border-bottom:1px solid var(--line)}
+.subnav .list{display:flex;gap:4px;overflow-x:auto;padding-block:8px}
+.subnav button{
+  background:none;border:none;cursor:pointer;white-space:nowrap;
+  padding:8px 14px;min-height:40px;border-radius:var(--r-m);
+  font-weight:500;color:var(--ink-3);font-size:14.5px;
+}
+.subnav button:hover{color:var(--ink);background:var(--s3)}
+.subnav button[aria-selected="true"]{color:var(--accent-ink);background:var(--accent-wash);font-weight:700}
+.view{display:none;padding-top:24px}
+.view.active{display:block}
+/* ============ CARDS ============ */
+.card{
+  background:var(--s1);border:1px solid var(--line);border-radius:var(--r-l);
+  padding:clamp(16px,2.4vw,24px);margin-bottom:16px;box-shadow:var(--sh-1);
+}
+.card header{margin-bottom:12px}
+.card h3{font-family:var(--f-display);font-size:21px;font-weight:700;letter-spacing:-.01em}
+.card .hint{font-size:13.5px;color:var(--ink-3);margin-top:4px;max-width:70ch}
+.card .hint b{color:var(--ink-2)}
+/* energy selector */
+.energy{display:grid;grid-template-columns:repeat(auto-fit,minmax(150px,1fr));gap:8px}
+.energy button{
+  display:grid;gap:4px;justify-items:start;text-align:left;cursor:pointer;
+  border:1px solid var(--line-2);border-radius:var(--r-m);background:var(--s2);
+  padding:12px 14px;min-height:64px;
+  transition:border-color 150ms ease-out,background 150ms ease-out;
+}
+.energy button:hover{border-color:var(--ink-3)}
+.energy button[aria-pressed="true"]{border-color:var(--accent);background:var(--accent-wash)}
+.energy button .lvl{font-weight:700;font-size:14.5px;color:var(--ink)}
+.energy button .lvl svg{margin-right:6px;color:var(--accent-ink);vertical-align:-2px}
+.energy button .for{font-size:12px;color:var(--ink-3)}
+/* forms */
+.frow{display:flex;gap:12px;flex-wrap:wrap}
+.f{display:flex;flex-direction:column;gap:5px;flex:1 1 150px}
+.f.grow{flex:2 1 260px}
+.f label{font-family:var(--f-mono);font-size:10.5px;letter-spacing:.12em;text-transform:uppercase;color:var(--ink-3)}
+input,select,textarea{
+  background:var(--s2);border:1px solid var(--line-2);border-radius:var(--r-m);
+  padding:10px 12px;min-height:44px;min-width:0;width:100%;
+}
+textarea{min-height:130px;resize:vertical;line-height:1.5}
+input:focus-visible,select:focus-visible,textarea:focus-visible{outline:2px solid var(--focus);outline-offset:1px;border-color:var(--accent)}
+/* ============ QUEUE ============ */
+.queue{list-style:none;padding:0;display:grid;gap:10px}
+.task{
+  display:grid;grid-template-columns:minmax(0,1fr) auto;gap:4px 12px;align-items:center;
+  border:1px solid var(--line);border-left:4px solid var(--ink-3);
+  border-radius:var(--r-m);background:var(--s2);padding:12px 14px;
+  transition:border-color 150ms ease-out;
+  animation:reveal 420ms ease-out both;
+}
+@keyframes reveal{from{opacity:0;translate:0 8px}to{opacity:1;translate:0 0}}
+.task:hover{border-color:var(--line-2)}
+.task.best{border-left-color:var(--accent);background:var(--accent-wash)}
+.task.hot{border-left-color:var(--danger)}
+.task.warm{border-left-color:var(--warn)}
+.task.done{opacity:.5;border-left-color:var(--ok)}
+.task .tt{font-weight:700;font-size:15px;line-height:1.35}
+.task.done .tt{text-decoration:line-through}
+.task .tm{display:flex;flex-wrap:wrap;gap:6px;align-items:center;margin-top:6px;font-size:12px;color:var(--ink-2)}
+.chip{
+  font-family:var(--f-mono);font-size:10px;letter-spacing:.06em;text-transform:uppercase;
+  border-radius:4px;padding:3px 7px;border:1px solid transparent;
+}
+.chip.cat{background:var(--s3);color:var(--ink-2)}
+.chip.best{background:var(--accent);color:#FFF}
+html[data-theme="dark"] .chip.best{color:#1A1006}
+.chip.hot{background:var(--danger);color:#FFF}
+.chip.warm{background:var(--warn);color:#FFF}
+html[data-theme="dark"] .chip.warm{color:#241A02}
+.chip.evi{background:var(--gold);color:#FFF}
+html[data-theme="dark"] .chip.evi{color:#241A02}
+.chip.ok{background:var(--ok);color:#FFF}
+.why{
+  grid-column:1/-1;font-size:12.5px;color:var(--ink-2);
+  background:var(--s3);border-radius:var(--r-s);padding:7px 10px;margin-top:2px;
+}
+.why b{color:var(--accent-ink)}
+.task .ops{display:flex;gap:6px}
+.ops button{
+  min-width:44px;min-height:40px;border:1px solid var(--line-2);border-radius:var(--r-m);
+  background:var(--s1);cursor:pointer;font-size:15px;color:var(--ink-2);
+  display:inline-flex;align-items:center;justify-content:center;
+  transition:background 120ms ease-out,border-color 120ms ease-out,color 120ms ease-out;
+}
+.ops button:hover{background:var(--s3);border-color:var(--ink-3);color:var(--ink)}
+.ops button.go:hover{background:var(--accent-wash);border-color:var(--accent);color:var(--accent-ink)}
+.ops button.fin:hover{background:var(--ok-wash);border-color:var(--ok);color:var(--ok)}
+.empty{
+  border:1px dashed var(--line-2);border-radius:var(--r-m);
+  padding:28px 20px;text-align:center;color:var(--ink-3);font-size:14px;
+}
+/* ============ WEEK GRID ============ */
+.grid7{display:grid;grid-template-columns:repeat(7,minmax(0,1fr));gap:6px}
+.dcol{border:1px solid var(--line);border-radius:var(--r-m);background:var(--s2);padding:6px;min-height:150px}
+.dcol.today{outline:2px solid var(--accent);outline-offset:-2px}
+.dcol .dh{font-family:var(--f-mono);font-size:10.5px;text-transform:uppercase;letter-spacing:.08em;color:var(--ink-3);margin:2px 2px 6px}
+.sl{border-radius:5px;padding:4px 6px;margin-bottom:4px;font-family:var(--f-mono);font-size:10.5px;cursor:pointer;border:1px solid transparent}
+.sl.free{background:transparent;border:1px dashed var(--line-2);color:var(--ink-3)}
+.sl.busy{background:var(--s3);color:var(--ink-3);cursor:default}
+.sl.task{background:var(--accent-wash);color:var(--accent-ink);border-color:var(--accent);font-weight:500}
+.sl.none{color:var(--ink-3);opacity:.7}
+.legend{display:flex;gap:14px;flex-wrap:wrap;margin-top:10px;font-size:12px;color:var(--ink-3)}
+.legend i{display:inline-block;width:10px;height:10px;border-radius:3px;margin-right:5px;vertical-align:-1px}
+/* ============ CAPTURE ============ */
+.quote{
+  border-left:3px solid var(--gold);background:var(--gold-wash);
+  padding:7px 11px;border-radius:0 var(--r-m) var(--r-m) 0;
+  font-size:13px;color:var(--ink-2);margin-top:6px;
+}
+.quote::before{content:"“";color:var(--gold);font-family:var(--f-display);font-weight:900}
+.quote::after{content:"”";color:var(--gold);font-family:var(--f-display);font-weight:900}
+.caps{display:grid;gap:10px}
+.cap{border:1px solid var(--line);border-radius:var(--r-m);background:var(--s2);padding:12px 14px}
+.cap .row1{display:flex;justify-content:space-between;gap:8px;flex-wrap:wrap;align-items:baseline}
+.cap .ct{font-weight:700;font-size:15px}
+.cap .verdict{font-family:var(--f-mono);font-size:10.5px;letter-spacing:.06em;text-transform:uppercase;font-weight:500}
+.cap .verdict.ok{color:var(--ok)} .cap .verdict.bad{color:var(--danger)}
+.cap .tm{display:flex;gap:6px;flex-wrap:wrap;font-size:12px;color:var(--ink-2);margin-top:6px}
+/* ============ SPRINT ============ */
+.sprintbar{
+  display:grid;grid-template-columns:auto minmax(0,1fr) auto;gap:16px;align-items:center;
+  border:1px solid var(--line-2);border-radius:var(--r-l);background:var(--s2);
+  padding:16px 18px;margin-top:12px;
+}
+.clock{font-family:var(--f-mono);font-size:44px;font-weight:500;letter-spacing:.02em;line-height:1}
+.clock.hot{color:var(--accent-ink)}
+.sprint-meta{font-size:13px;color:var(--ink-2)}
+.sprint-meta b{display:block;color:var(--ink);font-size:14.5px;margin-bottom:2px}
+.capy{width:108px;height:auto;cursor:pointer;transition:transform 180ms ease-out}
+.capy:hover{transform:rotate(-4deg) scale(1.05)}
+.capy:focus-visible{outline:2px solid var(--focus);outline-offset:2px;border-radius:6px}
+/* ============ TABLES ============ */
+.tscroll{overflow-x:auto}
+table{border-collapse:collapse;width:100%;font-size:13.5px;min-width:560px}
+th,td{border-bottom:1px solid var(--line);padding:9px 8px;text-align:left;vertical-align:top}
+th{font-family:var(--f-mono);font-size:10px;letter-spacing:.1em;text-transform:uppercase;color:var(--ink-3);border-bottom:1px solid var(--line-2)}
+td.num,th.num{text-align:right;font-family:var(--f-mono)}
+td .mini{font-size:11px;color:var(--ink-3)}
+/* ============ FOOTER / TOASTS ============ */
+footer{border-top:1px solid var(--line);padding-block:20px;color:var(--ink-3);font-size:12.5px}
+footer .mono{font-size:11px}
+.toast{
+  position:fixed;left:50%;bottom:20px;transform:translateX(-50%) translateY(8px);
+  background:var(--ink);color:var(--s1);border-radius:var(--r-m);
+  padding:11px 18px;font-size:14px;font-weight:500;opacity:0;pointer-events:none;
+  transition:opacity 200ms ease-out,transform 200ms ease-out;z-index:60;box-shadow:var(--sh-2);
+}
+html[data-theme="dark"] .toast{color:#121816}
+.toast.show{opacity:1;transform:translateX(-50%) translateY(0)}
+.capytoast{
+  position:fixed;right:18px;bottom:18px;max-width:300px;
+  background:var(--s2);border:1px solid var(--line-2);border-radius:var(--r-m);
+  box-shadow:var(--sh-2);padding:12px 15px;font-size:13px;color:var(--ink-2);
+  opacity:0;pointer-events:none;transition:opacity 240ms ease-out;z-index:55;
+}
+.capytoast.show{opacity:1}
+/* ============ BREAKPOINTS (site-wide set: 640 / 880 / 1024) ============ */
+@media (max-width:880px){
+  .hero .inner{grid-template-columns:1fr}
+  .sprintbar{grid-template-columns:1fr;justify-items:start;text-align:left;gap:12px}
+  .clock{font-size:38px}
+}
+@media (max-width:640px){
+  .grid7{grid-template-columns:repeat(4,minmax(0,1fr))}
+  .dcol{min-height:120px}
+  .task{grid-template-columns:1fr}
+  .task .ops{justify-content:flex-end}
+  .strip .v{font-size:16px}
+  .hero h2{font-size:clamp(30px,9vw,40px)}
+}
+@media (min-width:1024px){
+  .hero h2{font-size:58px}
+}
+</style>
+</head>
+<body>
+
+<!-- ================= TOP BAR ================= -->
+<header class="topbar">
+  <div class="wrap row">
+    <a class="brand" href="#" aria-label="Momentum home">
+      <span class="glyph" aria-hidden="true">M</span>
+      <b>Momentum</b>
+      <span class="ver">v1 · THH 2026</span>
+    </a>
+    <nav class="tools" aria-label="Global actions">
+      <button class="btn ghost sm" id="themeBtn" aria-pressed="false" title="Switch light / dark">
+        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" aria-hidden="true"><path d="M12 3a9 9 0 1 0 9 9 7 7 0 0 1-9-9z"/></svg>
+        Theme
+      </button>
+      <button class="btn ghost sm" id="sampleBtn">
+        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" aria-hidden="true"><path d="M4 19V5a2 2 0 0 1 2-2h9l5 5v11a2 2 0 0 1-2 2H6a2 2 0 0 1-2-2zM8 11h8M8 15h5"/></svg>
+        Load sample week
+      </button>
+      <button class="btn ghost sm" id="exportBtn">
+        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" aria-hidden="true"><path d="M12 3v12m0 0 4-4m-4 4-4-4M4 21h16"/></svg>
+        Export .ics
+      </button>
+    </nav>
+  </div>
+</header>
+
+<!-- ================= HERO ================= -->
+<section class="hero" aria-labelledby="heroH">
+  <div class="wrap inner">
+    <div>
+      <p class="eyebrow" id="heroH">Mission control for your week</p>
+      <h2>Deadlines say <em>when it's due.</em><br>Nobody says <em>when to start.</em></h2>
+      <p class="lede">Momentum plans backward from every deadline into the hours you're actually free, re-ranks the queue around your real energy, and refuses any AI suggestion that can't quote your own words back at you. One page. Works offline. Your data never leaves this device.</p>
+      <div class="cta">
+        <button class="btn primary" id="heroStart">
+          <svg width="15" height="15" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M8 5v14l11-7z"/></svg>
+          Plan my week
+        </button>
+        <a class="btn ghost" href="#capture-anchor" id="heroCapture">Capture a syllabus</a>
+      </div>
+    </div>
+    <div class="strip" role="status" aria-label="Live plan readouts">
+      <div class="cell hot"><div class="k">Do this next</div><div class="v big" id="kpiNext">—</div></div>
+      <div class="cell"><div class="k">Start-by</div><div class="v" id="kpiStart">—</div></div>
+      <div class="cell"><div class="k">Slack until deadline</div><div class="v" id="kpiSlack">—</div></div>
+      <div class="cell"><div class="k">Real pace</div><div class="v" id="kpiPace">—</div></div>
+    </div>
+  </div>
+</section>
+
+<!-- ================= SUB NAV ================= -->
+<nav class="subnav" aria-label="Sections">
+  <div class="wrap list" role="tablist">
+    <button role="tab" aria-selected="true"  data-view="plan"    id="tab-plan">Today's plan</button>
+    <button role="tab" aria-selected="false" data-view="capture" id="tab-capture">Capture</button>
+    <button role="tab" aria-selected="false" data-view="week"    id="tab-week">Free-time grid</button>
+    <button role="tab" aria-selected="false" data-view="sprint"  id="tab-sprint">Focus sprint</button>
+    <button role="tab" aria-selected="false" data-view="pace"    id="tab-pace">Honesty report</button>
+    <button role="tab" aria-selected="false" data-view="about"   id="tab-about">How it works</button>
+  </div>
+</nav>
+
+<main class="wrap deck" id="capture-anchor">
+  <!-- ============ VIEW: PLAN ============ -->
+  <section class="view active" id="view-plan" role="tabpanel" aria-labelledby="tab-plan">
+    <div class="card">
+      <header>
+        <h3>How are you running right now?</h3>
+        <p class="hint">The queue re-ranks to match real mental bandwidth: a foggy 9&nbsp;pm surfaces small wins; a sharp morning unlocks deep work.</p>
+      </header>
+      <div class="energy" role="group" aria-label="Current energy">
+        <button data-energy="low" aria-pressed="false"><span class="lvl"><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><path d="M13 2 3 14h7l-1 8 10-12h-7z"/></svg>Low · foggy</span><span class="for">10-minute wins only</span></button>
+        <button data-energy="steady" aria-pressed="true"><span class="lvl"><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><path d="M2 12c2-4 4-6 6-6s3 2 4 6 2 6 4 6 4-2 6-6"/></svg>Steady · flowing</span><span class="for">normal tasks</span></button>
+        <button data-energy="peak" aria-pressed="false"><span class="lvl"><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><path d="M5 3l14 9-6 1 4 8-3 1-4-8-3 4z"/></svg>Peak · sharp</span><span class="for">deep work unlocked</span></button>
+      </div>
+    </div>
+
+    <div class="card">
+      <header><h3>Add a task</h3></header>
+      <form id="addForm" class="frow" autocomplete="off">
+        <div class="f grow"><label for="inTitle">What needs doing</label><input id="inTitle" required maxlength="80" placeholder="Spanish quiz — verb tenses"></div>
+        <div class="f" style="flex:0 1 130px"><label for="inCat">Type</label>
+          <select id="inCat"><option>Homework</option><option>Study</option><option>Project</option><option>Reading</option><option>Chore</option><option>Other</option></select></div>
+        <div class="f" style="flex:0 1 110px"><label for="inEst">Estimate (h)</label><input id="inEst" type="number" min="0.25" max="12" step="0.25" value="1" class="mono"></div>
+        <div class="f" style="flex:0 1 200px"><label for="inDue">Deadline</label><input id="inDue" type="datetime-local"></div>
+        <div class="f" style="flex:0 0 auto;justify-content:flex-end"><label>&nbsp;</label><button class="btn" type="submit">Add to plan</button></div>
+      </form>
+    </div>
+
+    <div class="card">
+      <header>
+        <h3>Re-ranked queue</h3>
+        <p class="hint">Best match = deadline pressure × your energy × your real pace. <b id="modeNote"></b></p>
+      </header>
+      <ul class="queue" id="queue" aria-label="Task queue"></ul>
+      <div class="empty" id="emptyQueue">No tasks yet — add one above, or load the sample week to see the whole engine at work.</div>
+    </div>
+  </section>
+
+  <!-- ============ VIEW: CAPTURE ============ -->
+  <section class="view" id="view-capture" role="tabpanel" aria-labelledby="tab-capture">
+    <div class="card">
+      <header>
+        <h3>Evidence-verified capture</h3>
+        <p class="hint">Paste a syllabus, assignment sheet, or a chaotic brain-dump. Every extracted task must quote your exact words — <b>no citation, no task</b>. Unverified items are dropped. Works with zero setup: the offline rule-extractor parses dates, subjects, and durations; an optional OpenAI-compatible key adds the model path (stays in this browser).</p>
+      </header>
+      <form id="captureForm" autocomplete="off">
+        <div class="f"><label for="captureText">Your notes</label>
+          <textarea id="captureText" placeholder="Example:&#10;AP Bio lab report due Friday 11:59pm, needs 3 hours in the library.&#10;History essay: 1200 words, deadline Thursday.&#10;Math quiz next Monday on chapter 4.&#10;Club shirt design — should take 45 minutes, give to Ms. Ruiz by Wednesday."></textarea></div>
+        <div class="frow" style="margin-top:12px">
+          <div class="f" style="flex:1 1 240px"><label for="aiKey">AI key · optional</label><input id="aiKey" type="password" placeholder="blank = offline extractor"></div>
+          <div class="f" style="flex:0 0 auto;justify-content:flex-end"><label>&nbsp;</label><button class="btn primary" type="submit">Extract tasks</button></div>
+        </div>
+      </form>
+    </div>
+    <div class="card" id="captureOut" hidden>
+      <header>
+        <h3>Extracted — with receipts</h3>
+        <p class="hint">Each proposal carries the exact source quote it was derived from. Accept adds only the verified ones to your plan.</p>
+      </header>
+      <div class="caps" id="captureItems"></div>
+      <div style="margin-top:12px"><button class="btn" id="captureAccept">Add verified tasks to plan</button></div>
+    </div>
+  </section>
+
+  <!-- ============ VIEW: WEEK ============ -->
+  <section class="view" id="view-week" role="tabpanel" aria-labelledby="tab-week">
+    <div class="card">
+      <header>
+        <h3>Paint the hours you're actually free</h3>
+        <p class="hint">Click a block to toggle free ↔ busy. The planner only schedules inside painted-free blocks (defaults: weekday evenings 16:00–22:00, weekends 10:00–18:00).</p>
+      </header>
+      <div class="frow" style="margin-bottom:12px">
+        <button class="btn ghost sm" id="resetGrid">Reset to defaults</button>
+        <span class="hint mono" id="freeCount"></span>
+      </div>
+      <div class="grid7" id="weekGrid" role="grid" aria-label="Weekly free-time grid"></div>
+      <div class="legend">
+        <span><i style="background:var(--accent-wash);border:1px solid var(--accent)"></i>scheduled task</span>
+        <span><i style="border:1px dashed var(--line-2)"></i>free block (click to flip)</span>
+        <span><i style="background:var(--s3)"></i>busy</span>
+      </div>
+    </div>
+    <div class="card">
+      <header>
+        <h3>The computed week</h3>
+        <p class="hint">Backward fill: each task lands in the latest free blocks that still finish it before its deadline — earlier hours stay open for later-deadline work.</p>
+      </header>
+      <div class="grid7" id="scheduleGrid" role="grid" aria-label="Computed schedule"></div>
+      <p class="hint" id="schedNote" style="margin-top:10px"></p>
+    </div>
+  </section>
+
+  <!-- ============ VIEW: SPRINT ============ -->
+  <section class="view" id="view-sprint" role="tabpanel" aria-labelledby="tab-sprint">
+    <div class="card">
+      <header>
+        <h3>Focus sprint</h3>
+        <p class="hint">Big task? Slice it. The timer sizes itself to your energy — 10 minutes foggy, 25 steady, 50 at peak — with a zen companion who is <i>absolutely not</i> there for any reason. Nope. No secret criterion. Just vibes.</p>
+      </header>
+      <div class="frow" style="margin-bottom:4px">
+        <div class="f" style="flex:1 1 260px"><label for="sprintTask">Pick a task</label><select id="sprintTask"></select></div>
+        <div class="f" style="flex:0 0 auto;justify-content:flex-end"><label>&nbsp;</label><button class="btn primary" id="sprintStart">Start sprint</button></div>
+      </div>
+      <div class="sprintbar" id="sprintBox" hidden>
+        <svg class="capy" viewBox="0 0 120 70" role="button" tabindex="0" aria-label="A calm capybara — click it" id="capySvg">
+          <ellipse cx="60" cy="52" rx="44" ry="16" fill="#8a6f4d"/>
+          <ellipse cx="60" cy="38" rx="30" ry="17" fill="#a08359"/>
+          <rect x="42" y="19" width="8" height="13" rx="3" fill="#a08359"/>
+          <rect x="70" y="19" width="8" height="13" rx="3" fill="#a08359"/>
+          <circle cx="48" cy="36" r="2.2" fill="#2c1f10"/><circle cx="60" cy="36" r="2.2" fill="#2c1f10"/><circle cx="72" cy="36" r="2.2" fill="#2c1f10"/>
+          <ellipse cx="60" cy="50" rx="10" ry="4.5" fill="#6e5537"/>
+          <path d="M52 44 Q60 48 68 44" stroke="#6e5537" stroke-width="1.5" fill="none"/>
+        </svg>
+        <div class="sprint-meta"><b id="timerTask">—</b><span class="mono" id="timerSize"></span></div>
+        <div>
+          <div class="clock" id="timerEl">25:00</div>
+          <div class="frow" style="margin-top:10px">
+            <button class="btn ghost sm" id="sprintSlice">Slice smaller</button>
+            <button class="btn ghost sm" id="sprintDone">Done early</button>
+          </div>
+        </div>
+      </div>
+      <p class="hint" id="sprintMsg" style="margin-top:10px" role="status"></p>
+    </div>
+  </section>
+
+  <!-- ============ VIEW: PACE ============ -->
+  <section class="view" id="view-pace" role="tabpanel" aria-labelledby="tab-pace">
+    <div class="card">
+      <header>
+        <h3>Honesty report</h3>
+        <p class="hint">Plans fail because a “30-minute” essay takes 45. Every finished task tunes a per-type pace multiplier; all planning uses your real numbers, not your optimism.</p>
+      </header>
+      <div class="tscroll">
+        <table id="paceTable">
+          <thead><tr><th>Type</th><th class="num">Done</th><th class="num">You said</th><th class="num">It took</th><th class="num">Real pace</th><th>Effect on planning</th></tr></thead>
+          <tbody id="paceBody"></tbody>
+        </table>
+      </div>
+      <div class="empty" id="paceEmpty">No finished tasks yet — finish something and this report starts learning.</div>
+    </div>
+    <div class="card">
+      <header><h3>All tasks</h3></header>
+      <div class="tscroll">
+        <table>
+          <thead><tr><th>Task</th><th>Type</th><th class="num">Est (h)</th><th>Deadline</th><th>Start-by</th><th>Status</th></tr></thead>
+          <tbody id="allBody"></tbody>
+        </table>
+      </div>
+      <div style="margin-top:12px"><button class="btn ghost sm" id="clearDone">Clear finished</button></div>
+    </div>
+  </section>
+
+  <!-- ============ VIEW: ABOUT ============ -->
+  <section class="view" id="view-about" role="tabpanel" aria-labelledby="tab-about">
+    <div class="card">
+      <header><h3>How Momentum works</h3></header>
+      <p style="max-width:70ch">Built for the <b>Teens Hack Houston (Triple&nbsp;H) Hackathon 2026</b>, productivity theme, technical track. It fuses three ideas the research phase found separately across the field — backward deadline planning, energy-matched re-ranking, and evidence-verified capture — into one engine, deployed as a single offline file.</p>
+      <p style="max-width:70ch;margin-top:12px"><b>The scheduler</b> is deterministic: tasks sorted by deadline, placed backward into free blocks with pace-adjusted durations; same input, same plan — testable by design. <b>The capture layer</b> runs a rule-based extractor offline (weekday/time regexes, subject keywords, duration parsing) and an optional model path that must cite an exact substring of your text or the item is dropped. <b>The honesty loop</b> tunes per-category pace multipliers from your actual completion times.</p>
+      <p style="max-width:70ch;margin-top:12px"><b>Privacy:</b> everything lives in this browser's localStorage — no account, no server, no tracking; the optional key never leaves the page. <b>Accessibility:</b> full keyboard navigation, visible focus rings, AA-contrast in both themes, 44px touch targets, reduced-motion respected.</p>
+    </div>
+  </section>
+</main>
+
+<footer>
+  <div class="wrap">
+    <span class="mono">MOMENTUM v1</span> · Triple H Hackathon 2026 · one file, zero dependencies, offline-first · <span class="mono" id="fCount"></span>
+  </div>
+</footer>
+
+<div class="toast" id="toast" role="status" aria-live="polite"></div>
+<div class="capytoast" id="capyToast" role="status" aria-live="polite"></div>
+
+<script>
+/* =====================================================================
+   MOMENTUM — mission control for your week (engine v2, premium UI)
+   data → persistence → scheduler → energy re-rank → sprint →
+   evidence-verified capture → pace learning → render
+   ===================================================================== */
+"use strict";
+const LS_KEY = "momentum.v2";
+const $ = (s) => document.querySelector(s);
+const $$ = (s) => [...document.querySelectorAll(s)];
+const state = {
+  tasks: [],           // {id,title,cat,est,due,done,actual,createdAt,source?}
+  energy: "steady",
+  grid: {},            // "YYYY-MM-DD" -> {hour: "free"|"busy"} (2h blocks)
+  pace: {},            // cat -> {n, said, took}
+  captured: [],
+};
+const CATS = ["Homework","Study","Project","Reading","Chore","Other"];
+const BLOCK_H = 2;
+const DEEP_CATS = ["Project","Study"];
+const uid = () => (crypto.randomUUID ? crypto.randomUUID() : "t"+Date.now()+Math.random().toString(36).slice(2,8));
+
+/* ---------- persistence ---------- */
+function save(){ try{ localStorage.setItem(LS_KEY, JSON.stringify(state)); }catch(e){} }
+function load(){
+  try{
+    const raw = localStorage.getItem(LS_KEY);
+    if(!raw) return false;
+    Object.assign(state, JSON.parse(raw));
+    return true;
+  }catch(e){ return false; }
+}
+
+/* ---------- time helpers ---------- */
+const fmtDate = (iso) => iso ? new Date(iso).toLocaleDateString(undefined,{weekday:"short",month:"short",day:"numeric",hour:"numeric",minute:"2-digit"}).replace(":00","") : "—";
+const dayKey = (d) => { const x=new Date(d); x.setMinutes(x.getMinutes()-x.getTimezoneOffset()); return x.toISOString().slice(0,10); };
+const hoursUntil = (dt) => (new Date(dt) - Date.now())/36e5;
+function startOfDayOffset(offset){ const d=new Date(); d.setHours(0,0,0,0); d.setDate(d.getDate()+offset); return d; }
+
+function defaultGrid(){
+  const g = {};
+  for(let i=0;i<7;i++){
+    const d = startOfDayOffset(i), key = dayKey(d), weekend = d.getDay()===6||d.getDay()===0;
+    g[key] = {};
+    for(let h=0;h<24;h+=BLOCK_H){
+      g[key][h] = (weekend ? (h>=10 && h<18) : (h>=16 && h<22)) ? "free" : "busy";
+    }
+  }
+  return g;
+}
+
+/* ---------- pace ---------- */
+const paceMult = (cat) => {
+  const p = state.pace[cat];
+  if(!p || !p.n || !p.said) return 1;
+  return Math.max(.5, Math.min(2.5, p.took / p.said));
+};
+
+/* =====================================================================
+   SCHEDULER — backward pass (deterministic, testable)
+   ===================================================================== */
+function schedule(){
+  const days = Object.keys(state.grid).sort().slice(0,7);
+  const open = [];
+  for(const dk of days) for(const h of Object.keys(state.grid[dk]))
+    if(state.grid[dk][h] === "free") open.push({day:dk, hour:+h});
+  const pending = state.tasks.filter(t=>!t.done && t.due)
+    .sort((a,b)=> new Date(a.due)-new Date(b.due));
+  const plan = {}, meta = {}, used = new Set();
+  for(const t of pending){
+    const need = Math.max(BLOCK_H*0.5, t.est * paceMult(t.cat));
+    const due = new Date(t.due);
+    const blocks = open.filter(s => new Date(s.day+"T23:59:59") < due && !used.has(s.day+"@"+s.hour));
+    const needBlocks = Math.ceil(need / BLOCK_H);
+    const chosen = blocks.slice(-needBlocks);           // latest-safe placement
+    if(chosen.length){
+      plan[t.id] = chosen.map(s=>({day:s.day, hour:s.hour, h:BLOCK_H}));
+      chosen.forEach(s => used.add(s.day+"@"+s.hour));
+      const first = chosen[0];
+      const startBy = new Date(first.day+"T"+String(first.hour).padStart(2,"0")+":00:00");
+      meta[t.id] = { startBy, slackH: hoursUntil(t.due)-need, fits: chosen.length===needBlocks };
+    } else {
+      meta[t.id] = { startBy: new Date(), slackH: hoursUntil(t.due)-need, fits:false };
+    }
+  }
+  return { plan, meta, openCount: open.length - used.size };
+}
+
+/* =====================================================================
+   ENERGY RE-RANK
+   ===================================================================== */
+function rank(tasks){
+  return tasks.map(t=>{
+    const hLeft = t.due ? hoursUntil(t.due) : 24*7;
+    const dur = t.est * paceMult(t.cat);
+    const urgency = hLeft<=0 ? 100 : Math.min(100, 24/Math.max(hLeft,.5)*20);
+    const deep = DEEP_CATS.includes(t.cat) ? 1 : 0;
+    const fit = state.energy==="low"   ? (dur<=0.75?25:dur>=1.5?-15:0)
+              : state.energy==="peak"  ? (deep?25:dur>=1?10:0)
+              : (deep?5:8);
+    const score = urgency*0.55 + fit*0.9 + Math.min(20, 10/(dur||.5)) + (t.due?6:0);
+    return { t, score, dur };
+  }).sort((a,b)=> b.score - a.score);
+}
+
+/* =====================================================================
+   RENDER
+   ===================================================================== */
+function toast(msg){
+  const el = $("#toast"); el.textContent = msg; el.classList.add("show");
+  clearTimeout(el._tm); el._tm = setTimeout(()=>el.classList.remove("show"), 2200);
+}
+function esc(s){ return String(s).replace(/[&<>"]/g, m=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;"}[m])); }
+
+const ICONS = {
+  play:'<svg width="14" height="14" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M8 5v14l11-7z"/></svg>',
+  check:'<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.6" aria-hidden="true"><path d="M4 12.5 9 18 20 6"/></svg>',
+  x:'<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" aria-hidden="true"><path d="M6 6l12 12M18 6 6 18"/></svg>',
+};
+
+function render(){
+  const { plan, meta } = schedule();
+  const pending = state.tasks.filter(t=>!t.done);
+  const ranked = rank(pending);
+  const best = ranked[0];
+
+  $("#kpiNext").textContent = best ? best.t.title.slice(0,22) : "—";
+  $("#kpiStart").textContent = best && best.t.due && meta[best.t.id] ? fmtDate(meta[best.t.id].startBy) : "—";
+  if(best && best.t.due){
+    const m = meta[best.t.id];
+    $("#kpiSlack").textContent = m ? (m.slackH>=0 ? Math.round(m.slackH)+"h" : "overdue") : "—";
+  } else $("#kpiSlack").textContent = "—";
+  const doneT = state.tasks.filter(t=>t.done);
+  const said = doneT.reduce((s,t)=>s+t.est,0), took = doneT.reduce((s,t)=>s+(t.actual||t.est),0);
+  $("#kpiPace").textContent = said ? "×"+(took/said).toFixed(2) : "—";
+  $("#fCount").textContent = state.tasks.length + " task"+(state.tasks.length===1?"":"s")+" · stored on this device only";
+  $("#modeNote").textContent = state.energy==="low" ? "Foggy mode: small wins first."
+    : state.energy==="peak" ? "Peak mode: deep work first." : "";
+
+  const q = $("#queue"); q.innerHTML = "";
+  $("#emptyQueue").style.display = pending.length ? "none" : "block";
+  ranked.forEach((r,i)=>{
+    const m = meta[r.t.id];
+    const overdue = r.t.due && hoursUntil(r.t.due)<0;
+    const tooLate = r.t.due && hoursUntil(r.t.due) < r.dur && !overdue;
+    const noRoom = m && !m.fits && !!r.t.due;
+    const li = document.createElement("li");
+    li.className = "task"
+      + (i===0 && pending.length ? " best" : "")
+      + (overdue||tooLate ? " hot" : noRoom ? " warm" : "");
+    li.style.animationDelay = Math.min(i*55, 400)+"ms";
+    const chips = [];
+    if(i===0 && pending.length) chips.push('<span class="chip best">Best match</span>');
+    if(overdue) chips.push('<span class="chip hot">Overdue</span>');
+    if(tooLate) chips.push('<span class="chip hot">Too late to wait</span>');
+    if(noRoom) chips.push('<span class="chip warm">No room — start now</span>');
+    if(r.t.source) chips.push('<span class="chip evi">Evidence ✓</span>');
+    chips.push(`<span class="chip cat">${esc(r.t.cat)}</span>`);
+    const why = i===0 && pending.length
+      ? `<b>Why now:</b> ${r.t.due?"due "+fmtDate(r.t.due)+", ":""}${state.energy} energy fits this ${r.dur.toFixed(1)}h ${r.t.cat.toLowerCase()} at your real pace.`
+      : overdue ? "<b>Why urgent:</b> the deadline has already passed."
+      : tooLate ? "<b>Why urgent:</b> less time left than the task takes at your real pace."
+      : noRoom ? "<b>Why now:</b> your free grid has no room before the deadline — start immediately or paint more free time."
+      : "";
+    li.innerHTML = `
+      <div>
+        <div class="tt">${esc(r.t.title)}</div>
+        <div class="tm">${chips.join(" ")}
+          <span class="mono">est ${r.t.est}h → real ${r.dur.toFixed(1)}h</span>
+          ${r.t.due?`<span class="mono">due ${fmtDate(r.t.due)}</span>`:""}
+          ${m&&r.t.due?`<span class="mono">start-by ${fmtDate(m.startBy)}</span>`:""}
+        </div>
+        ${why?`<div class="why">${why.replace("<b>","<b>").replace("</b>","</b>")}</div>`:""}
+      </div>
+      <div class="ops">
+        <button class="go" data-act="sprint" data-id="${r.t.id}" title="Start a sized sprint" aria-label="Sprint ${esc(r.t.title)}">${ICONS.play}</button>
+        <button class="fin" data-act="done" data-id="${r.t.id}" title="Mark done" aria-label="Finish ${esc(r.t.title)}">${ICONS.check}</button>
+        <button data-act="del" data-id="${r.t.id}" title="Delete" aria-label="Delete ${esc(r.t.title)}">${ICONS.x}</button>
+      </div>`;
+    q.appendChild(li);
+  });
+
+  renderWeek(plan);
+  renderAll(meta);
+  renderPace();
+  renderSprintSelect();
+}
+
+const DAYN = ["Sun","Mon","Tue","Wed","Thu","Fri","Sat"];
+function renderWeek(plan){
+  const days = Object.keys(state.grid).sort().slice(0,7);
+  const todayK = dayKey(new Date());
+  const wg = $("#weekGrid"); wg.innerHTML = "";
+  const sg = $("#scheduleGrid"); sg.innerHTML = "";
+  const mk = (gridEl, mode) => {
+    days.forEach(dk=>{
+      const d = new Date(dk+"T12:00:00");
+      const col = document.createElement("div");
+      col.className = "dcol"+(dk===todayK?" today":"");
+      col.innerHTML = `<div class="dh">${DAYN[d.getDay()]} ${d.getMonth()+1}/${d.getDate()}</div>`;
+      const hours = mode==="paint" ? [16,18,20] : [10,12,14,16,18,20];
+      for(const h of hours){
+        const slot = document.createElement("div");
+        if(mode==="paint"){
+          const st = state.grid[dk][h]||"busy";
+          slot.className = "sl "+(st==="free"?"free":"busy");
+          slot.textContent = h+":00 "+(st==="free"?"free":"busy");
+          slot.setAttribute("role","gridcell");
+          slot.tabIndex = 0;
+          const flip = ()=>{ state.grid[dk][h] = state.grid[dk][h]==="free"?"busy":"free"; save(); render(); };
+          slot.onclick = flip;
+          slot.onkeydown = (e)=>{ if(e.key===" "||e.key==="Enter"){ e.preventDefault(); flip(); } };
+        } else {
+          const hit = Object.entries(plan||{}).find(([tid,blocks])=> blocks.some(b=>b.day===dk&&b.hour===h));
+          if(hit){
+            const t = state.tasks.find(x=>x.id===hit[0]);
+            slot.className = "sl task";
+            slot.textContent = t ? t.title.slice(0,15) : "task";
+            slot.title = t ? `${t.title} — est ${t.est}h → ${(t.est*paceMult(t.cat)).toFixed(1)}h real` : "";
+          } else if(state.grid[dk][h]==="free"){
+            slot.className = "sl free"; slot.textContent = h+":00 open";
+          } else { slot.className = "sl none"; slot.textContent = h+":00 ·"; }
+        }
+        col.appendChild(slot);
+      }
+      gridEl.appendChild(col);
+    });
+  };
+  mk(wg, "paint");
+  mk(sg, "sched");
+  const freeCount = days.reduce((n,dk)=> n+Object.values(state.grid[dk]).filter(v=>v==="free").length, 0);
+  $("#freeCount").textContent = freeCount + " free 2-hour blocks this week";
+  $("#schedNote").textContent = "Backward-filled: each task occupies the latest free blocks that still finish it before its deadline. Earlier hours stay open for later-deadline work.";
+}
+
+function renderAll(meta){
+  const b = $("#allBody"); b.innerHTML = "";
+  state.tasks.slice().sort((a,b2)=> (a.done?1:0)-(b2.done?1:0) || new Date(b2.createdAt)-new Date(a.createdAt)).forEach(t=>{
+    const m = meta[t.id];
+    const tr = document.createElement("tr");
+    tr.innerHTML = `<td>${esc(t.title)}${t.source?' <span class="chip evi">EVI</span>':""}</td><td>${t.cat}</td>
+      <td class="num">${t.est}</td><td class="mono">${t.due?fmtDate(t.due):"—"}</td>
+      <td class="mono">${m&&t.due?fmtDate(m.startBy):"—"}</td>
+      <td>${t.done?'<span class="chip ok">done</span>':(t.due&&hoursUntil(t.due)<0?'<span class="chip hot">overdue</span>':"queued")}</td>`;
+    b.appendChild(tr);
+  });
+}
+
+function renderPace(){
+  const b = $("#paceBody"); b.innerHTML = "";
+  const rows = Object.entries(state.pace).filter(([c,p])=>p.n>0);
+  $("#paceEmpty").style.display = rows.length?"none":"block";
+  $("#paceTable").style.display = rows.length?"":"none";
+  rows.forEach(([cat,p])=>{
+    const mult = p.said? (p.took/p.said):1;
+    const effect = mult>1.05 ? `planning ${Math.round((mult-1)*100)}% more time for ${cat.toLowerCase()}`
+      : mult<0.95 ? `you're faster than you think on ${cat.toLowerCase()} (−${Math.round((1-mult)*100)}%)`
+      : `your ${cat.toLowerCase()} estimates are honest`;
+    const tr = document.createElement("tr");
+    tr.innerHTML = `<td>${cat}</td><td class="num">${p.n}</td><td class="num">${p.said.toFixed(1)}h</td>
+      <td class="num">${p.took.toFixed(1)}h</td><td class="num">×${mult.toFixed(2)}</td><td>${effect}</td>`;
+    b.appendChild(tr);
+  });
+}
+
+function renderSprintSelect(){
+  const sel = $("#sprintTask"); sel.innerHTML = "";
+  rank(state.tasks.filter(t=>!t.done)).forEach(r=>{
+    const o = document.createElement("option"); o.value = r.t.id;
+    o.textContent = `${r.t.title.slice(0,40)} — ${r.t.est}h ${r.t.cat.toLowerCase()}`;
+    sel.appendChild(o);
+  });
+}
+
+/* =====================================================================
+   SPRINT
+   ===================================================================== */
+const sprint = { total:0, left:0, timer:null, taskId:null };
+const sprintMinutes = () => ({ low:10, steady:25, peak:50 }[state.energy]);
+function startSprint(taskId){
+  const t = state.tasks.find(x=>x.id===taskId); if(!t) return;
+  sprint.taskId = taskId;
+  sprint.total = sprintMinutes()*60; sprint.left = sprint.total;
+  $("#sprintBox").hidden = false;
+  $("#timerTask").textContent = t.title;
+  $("#timerSize").textContent = `${sprintMinutes()} min ${state.energy} sprint · sized to your energy`;
+  $("#sprintMsg").textContent = "";
+  selectView("sprint");
+  clearInterval(sprint.timer);
+  tick(); sprint.timer = setInterval(tick, 1000);
+}
+function tick(){
+  const m = Math.floor(sprint.left/60), s = sprint.left%60;
+  const el = $("#timerEl");
+  el.textContent = `${String(m).padStart(2,"0")}:${String(s).padStart(2,"0")}`;
+  el.classList.toggle("hot", sprint.left<=300);
+  if(sprint.left<=0){
+    clearInterval(sprint.timer);
+    $("#sprintMsg").textContent = "Sprint done. Take a five-minute break — it genuinely helps.";
+    capySay("The capybara nods solemnly. Rest is part of the plan.");
+  }
+  sprint.left--;
+}
+function sliceSmaller(){
+  if(sprint.left>120){
+    const half = Math.max(5*60, Math.floor(sprint.left/2));
+    sprint.left = half; sprint.total = half;
+    $("#sprintMsg").textContent = `Sliced — new half is ${Math.ceil(half/60)} minutes. Momentum beats perfection.`;
+  }
+}
+
+let capyClicks = 0;
+function capySay(msg){
+  const el = $("#capyToast"); el.textContent = msg; el.classList.add("show");
+  clearTimeout(el._tm); el._tm = setTimeout(()=>el.classList.remove("show"), 4500);
+}
+
+/* =====================================================================
+   EVIDENCE-VERIFIED CAPTURE — offline rules + optional model
+   ===================================================================== */
+const OFF = {
+  dayMap: {"monday":0,"tuesday":1,"wednesday":2,"thursday":3,"friday":4,"saturday":5,"sunday":6,
+           "mon":0,"tue":1,"tues":1,"wed":2,"weds":2,"thu":3,"thur":3,"thurs":3,"fri":4,"sat":5,"sun":6},
+  catWords: {
+    Homework:["hw","homework","problem set","worksheet","questions","exercise","lab","lab report"],
+    Study:["quiz","test","exam","study","review","memorize","flashcards","revise"],
+    Project:["project","essay","report","paper","build","design","presentation","slides","prototype"],
+    Reading:["read","reading","chapter","pages","novel","textbook"],
+    Chore:["chore","laundry","clean","room","dishes","trash"] },
+};
+function parseWhen(text){
+  let m = text.match(/(\d{1,2})\/(\d{1,2})/);
+  if(m){
+    const now = new Date();
+    const d = new Date(now.getFullYear(), +m[1]-1, +m[2], 23, 59);
+    if(d < now) d.setFullYear(now.getFullYear()+1);
+    return d;
+  }
+  for(const [word, wd] of Object.entries(OFF.dayMap)){
+    if(new RegExp("\\b"+word+"\\b","i").test(text)){
+      const hm = text.match(/(\d{1,2})\s*(am|pm)|(1[0-2]|0?[1-9]):(\d{2})/i);
+      let hour = 23, minute = 0;
+      if(hm){
+        hour = +(hm[1]||hm[3]);
+        if((hm[2]||"").toLowerCase()==="pm" && hour<12) hour+=12;
+        if(!hm[2] && !hm[4] && hour<8) hour+=12;
+        minute = hm[4] ? +hm[4] : 0;
+      }
+      const d = new Date();
+      const delta = (wd - d.getDay() + 7) % 7 || 7;
+      d.setDate(d.getDate()+delta); d.setHours(hour, minute, 0, 0);
+      return d;
+    }
+  }
+  if(/tonight/i.test(text)){ const d=new Date(); d.setHours(22,0,0,0); return d; }
+  if(/tomorrow/i.test(text)){ const d=new Date(); d.setDate(d.getDate()+1); d.setHours(23,59,0,0); return d; }
+  if(/next week/i.test(text)){ const d=new Date(); d.setDate(d.getDate()+7); d.setHours(23,59,0,0); return d; }
+  return null;
+}
+function parseCat(body){
+  for(const [cat, words] of Object.entries(OFF.catWords))
+    if(words.some(w => body.toLowerCase().includes(w))) return cat;
+  return "Other";
+}
+function parseEst(body, cat){
+  let m = body.match(/(\d+(?:\.\d+)?)\s*(?:hours?|hrs?|h\b)/i);
+  if(m) return Math.max(.25, Math.min(12, +m[1]));
+  m = body.match(/(\d+)\s*(?:minutes?|mins?|m\b)/i);
+  if(m) return Math.max(.25, Math.min(12, +m[1]/60));
+  return ({Homework:1.25,Study:1,Project:2,Reading:.75,Chore:.5,Other:1})[cat];
+}
+function titleFrom(line){
+  let t = line.split(/[.;:\n]/)[0].trim()
+    .replace(/\b(due|by|before|deadline)\b.*$/i,"").replace(/\s+/g," ").trim()
+    .replace(/^(i have|i need to|remember to|don'?t forget to|do)\s+/i,"");
+  if(t.length>3 && t.length<70) return t.charAt(0).toUpperCase()+t.slice(1);
+  return line.slice(0,60).trim();
+}
+function offlineExtract(text){
+  const lines = text.split(/\n|(?<=\.)\s+(?=[A-Z])/).map(s=>s.trim()).filter(s=>s.length>6);
+  const out = [];
+  for(const line of lines){
+    const due = parseWhen(line);
+    if(!due) continue;
+    const cat = parseCat(line);
+    out.push({ title:titleFrom(line), cat, est:parseEst(line,cat),
+      due:due.toISOString(), quote:line.slice(0,140), verified:true, engine:"rules" });
+  }
+  return out;
+}
+async function modelExtract(text, key){
+  const sys = "You extract tasks from student notes. Return STRICT JSON array only. Each item: {\"title\":string<=60, \"cat\":one of Homework|Study|Project|Reading|Chore|Other, \"est\":hours number, \"due\":ISO8601 or null, \"quote\": EXACT substring of the input evidencing this task}. No commentary.";
+  const res = await fetch("https://api.openai.com/v1/chat/completions", {
+    method:"POST",
+    headers:{ "Content-Type":"application/json", "Authorization":"Bearer "+key },
+    body: JSON.stringify({ model:"gpt-4o-mini", temperature:0,
+      messages:[{role:"system",content:sys},{role:"user",content:text.slice(0,4000)}] }),
+  });
+  if(!res.ok) throw new Error("model "+res.status);
+  const data = await res.json();
+  const arr = JSON.parse(data.choices[0].message.content.replace(/```json|```/g,"").trim());
+  if(!Array.isArray(arr)) throw new Error("not array");
+  return arr.map(item=>{
+    const q = String(item.quote||"");
+    const verified = q.length>3 && text.includes(q);      // EVIDENCE RULE
+    return { title:String(item.title||"task").slice(0,70),
+      cat:CATS.includes(item.cat)?item.cat:"Other", est:+item.est||1,
+      due:(item.due && !isNaN(new Date(item.due))) ? new Date(item.due).toISOString():null,
+      quote:q.slice(0,140), verified, engine:"model" };
+  }).filter(i=>i.title && (i.verified || i.due));
+}
+function renderCapture(items){
+  state.captured = items;
+  const box = $("#captureOut"); box.hidden = false;
+  const wrapEl = $("#captureItems"); wrapEl.innerHTML = "";
+  const nOK = items.filter(i=>i.verified).length;
+  box.querySelector("h3").textContent = `Extracted — with receipts (${nOK} verified, ${items.length-nOK} dropped)`;
+  items.forEach(it=>{
+    const div = document.createElement("div");
+    div.className = "cap";
+    div.innerHTML = `
+      <div class="row1">
+        <span class="ct">${esc(it.title)}</span>
+        <span class="verdict ${it.verified?"ok":"bad"}">${it.verified?"Evidence ✓ verified quote":"⚠ unverified — dropped"}</span>
+      </div>
+      <div class="tm">
+        <span class="chip cat">${it.cat}</span>
+        <span class="mono">est ${it.est}h</span>
+        ${it.due?`<span class="mono">due ${fmtDate(it.due)}</span>`:`<span class="mono">no date found</span>`}
+        <span class="mono">engine: ${it.engine}</span>
+      </div>
+      ${it.quote?`<div class="quote">${esc(it.quote)}</div>`:""}`;
+    wrapEl.appendChild(div);
+  });
+}
+function acceptCapture(){
+  const ok = state.captured.filter(i=>i.verified);
+  ok.forEach(c=>{
+    state.tasks.push({ id:uid(), title:c.title, cat:c.cat, est:c.est, due:c.due,
+      done:false, createdAt:Date.now(), source:c.quote });
+  });
+  save(); render();
+  toast(ok.length+" verified task"+(ok.length===1?"":"s")+" added");
+  $("#captureOut").hidden = true;
+}
+
+/* =====================================================================
+   WIRING
+   ===================================================================== */
+function selectView(name){
+  $$(".subnav button").forEach(t=>t.setAttribute("aria-selected", String(t.dataset.view===name)));
+  $$(".view").forEach(v=>v.classList.toggle("active", v.id==="view-"+name));
+}
+$$(".subnav button").forEach(b=> b.addEventListener("click", ()=> selectView(b.dataset.view)));
+
+$$(".energy button").forEach(b=> b.addEventListener("click", ()=>{
+  state.energy = b.dataset.energy;
+  $$(".energy button").forEach(x=>x.setAttribute("aria-pressed", String(x===b)));
+  save(); render();
+}));
+
+$("#addForm").addEventListener("submit", (e)=>{
+  e.preventDefault();
+  state.tasks.push({ id:uid(), title:$("#inTitle").value.trim(), cat:$("#inCat").value,
+    est:+$("#inEst").value||1, due:$("#inDue").value?new Date($("#inDue").value).toISOString():null,
+    done:false, createdAt:Date.now() });
+  $("#inTitle").value = "";
+  save(); render(); toast("Added — plan recomputed");
+});
+
+$("#queue").addEventListener("click", (e)=>{
+  const btn = e.target.closest("[data-act]"); if(!btn) return;
+  const id = btn.dataset.id;
+  if(btn.dataset.act==="sprint") startSprint(id);
+  if(btn.dataset.act==="del"){ state.tasks = state.tasks.filter(t=>t.id!==id); save(); render(); }
+  if(btn.dataset.act==="done"){
+    const t = state.tasks.find(x=>x.id===id);
+    const defMin = Math.round(t.est*paceMult(t.cat)*60);
+    const input = prompt(`How long did "${t.title}" really take? (minutes)`, defMin);
+    if(input===null) return;
+    const took = Math.max(1,(+input||defMin))/60;
+    t.done = true; t.actual = took;
+    const p = state.pace[t.cat] || (state.pace[t.cat]={n:0,said:0,took:0});
+    p.n++; p.said += t.est; p.took += took;
+    save(); render(); toast("Done — honesty report updated");
+  }
+});
+
+$("#captureForm").addEventListener("submit", async (e)=>{
+  e.preventDefault();
+  const text = $("#captureText").value.trim();
+  if(!text) return;
+  const key = $("#aiKey").value.trim();
+  let items;
+  if(key){
+    try{ items = await modelExtract(text, key); }
+    catch(err){ items = offlineExtract(text); toast("Model unreachable — offline extractor used"); }
+  } else items = offlineExtract(text);
+  if(!items.length){ toast("No dated tasks found in that text"); return; }
+  renderCapture(items);
+});
+$("#captureAccept").addEventListener("click", acceptCapture);
+
+$("#resetGrid").addEventListener("click", ()=>{ state.grid = defaultGrid(); save(); render(); });
+$("#clearDone").addEventListener("click", ()=>{ state.tasks = state.tasks.filter(t=>!t.done); save(); render(); });
+$("#sampleBtn").addEventListener("click", loadSample);
+$("#heroStart").addEventListener("click", ()=> selectView("plan"));
+$("#heroCapture").addEventListener("click", (e)=>{ e.preventDefault(); selectView("capture"); });
+
+$("#exportBtn").addEventListener("click", ()=>{
+  const { meta } = schedule();
+  const lines = ["BEGIN:VCALENDAR","VERSION:2.0","PRODID:-//Momentum//THH2026//EN"];
+  state.tasks.filter(t=>t.due).forEach(t=>{
+    const m = meta[t.id];
+    const dt = (d)=> new Date(d).toISOString().replace(/[-:]/g,"").split(".")[0]+"Z";
+    lines.push("BEGIN:VEVENT","UID:mom-"+t.id+"@local",
+      "SUMMARY:"+t.title.replace(/[,;]/g," "), "DTSTAMP:"+dt(Date.now()));
+    if(m) lines.push("DTSTART:"+dt(m.startBy));
+    lines.push("DTEND:"+dt(t.due),
+      "DESCRIPTION:"+(t.cat+" — start-by "+(m?fmtDate(m.startBy):"now")).replace(/[,;]/g," "),
+      "END:VEVENT");
+  });
+  lines.push("END:VCALENDAR");
+  const blob = new Blob([lines.join("\r\n")], {type:"text/calendar"});
+  const a = document.createElement("a");
+  a.href = URL.createObjectURL(blob); a.download = "momentum-plan.ics"; a.click();
+  setTimeout(()=>URL.revokeObjectURL(a.href), 4000);
+});
+
+$("#sprintStart").addEventListener("click", ()=>{ const id=$("#sprintTask").value; if(id) startSprint(id); });
+$("#sprintSlice").addEventListener("click", sliceSmaller);
+$("#sprintDone").addEventListener("click", ()=>{
+  clearInterval(sprint.timer);
+  $("#sprintMsg").textContent = "Stopped early — that counts. Finish the task from the queue when it's fully done.";
+});
+const capy = $("#capySvg");
+capy.addEventListener("click", ()=>{
+  capyClicks++;
+  const msgs = ["The capybara blinks slowly. It believes in you.",
+    "Capybaras soak in hot springs to unwind. You are allowed to rest too.",
+    "Streak noted. The capybara adds another pebble to your pile.",
+    "…the capybara has run out of wisdom and is simply vibing. Keep going."];
+  capySay(msgs[Math.min(capyClicks-1, msgs.length-1)]);
+});
+capy.addEventListener("keydown", (e)=>{ if(e.key===" "||e.key==="Enter"){ e.preventDefault(); capy.click(); } });
+
+$("#themeBtn").addEventListener("click", ()=>{
+  const root = document.documentElement;
+  const cur = root.getAttribute("data-theme");
+  if(cur==="light") root.setAttribute("data-theme","dark");
+  else if(cur==="dark") root.setAttribute("data-theme","light");
+  else root.setAttribute("data-theme", matchMedia("(prefers-color-scheme: dark)").matches ? "light" : "dark");
+  const now = root.getAttribute("data-theme");
+  const isDark = !now ? matchMedia("(prefers-color-scheme: dark)").matches : now==="dark";
+  $("#themeBtn").setAttribute("aria-pressed", String(isDark));
+});
+
+/* ---------- sample week ---------- */
+function loadSample(){
+  const now = new Date();
+  const at = (d,h,m=0)=>{ const x=new Date(now); x.setDate(x.getDate()+d); x.setHours(h,m,0,0); return x.toISOString(); };
+  state.tasks = [
+    { id:uid(), title:"AP Bio lab report — enzyme kinetics", cat:"Homework", est:3, due:at(2,23,59), done:false, createdAt:Date.now() },
+    { id:uid(), title:"History essay: 1200 words, Gilded Age", cat:"Project", est:4, due:at(1,23,59), done:false, createdAt:Date.now() },
+    { id:uid(), title:"Spanish quiz — verb tenses", cat:"Study", est:1, due:at(0,22,0), done:false, createdAt:Date.now() },
+    { id:uid(), title:"Math worksheet 4.3 (odd problems)", cat:"Homework", est:1.5, due:at(3,23,59), done:false, createdAt:Date.now() },
+    { id:uid(), title:"Read chapters 7–8 for English", cat:"Reading", est:1.5, due:at(4,23,59), done:false, createdAt:Date.now() },
+    { id:uid(), title:"Club shirt design for Ms. Ruiz", cat:"Project", est:0.75, due:at(1,16,0), done:false, createdAt:Date.now() },
+    { id:uid(), title:"Laundry + room reset", cat:"Chore", est:0.75, due:at(5,20,0), done:false, createdAt:Date.now() },
+    { id:uid(), title:"Chem test — chapters 4–5", cat:"Study", est:3, due:at(6,9,0), done:false, createdAt:Date.now() },
+  ];
+  state.pace = { Homework:{n:3,said:3.5,took:4.9}, Study:{n:1,said:1,took:1.2} };
+  state.grid = defaultGrid();
+  save(); render();
+  toast("Sample week loaded — watch the queue re-rank");
+  selectView("plan");
+}
+
+/* ---------- boot ---------- */
+if(!load() || !Object.keys(state.grid).length) state.grid = defaultGrid();
+$$(".energy button").forEach(x=>x.setAttribute("aria-pressed", String(x.dataset.energy===state.energy)));
+render();
+</script>
+</body>
+</html>
