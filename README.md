@@ -1,6 +1,7 @@
 # Momentum — mission control for your week
 
 **Live demo:** https://ashiqhussainmir.github.io/momentum/
+**Video pitch:** [demo/momentum_demo.mp4](demo/momentum_demo.mp4) (2:27, well under the 10-minute limit)
 **Repo:** https://github.com/ashiqhussainmir/momentum
 
 Momentum is a student productivity command center that answers the three questions every other planner ignores: **when should I start, what should I do when I'm tired, and can I trust what the AI just extracted?** It is one self-contained HTML file — no build step, no backend, no account — and it works fully offline in any modern browser. Built for the **Teens Hack Houston (Triple H) Hackathon 2026**, productivity theme, Technical track.
